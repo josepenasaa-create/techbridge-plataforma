@@ -6,7 +6,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { ChatMessage } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI("AIzaSyDk4cvF2Nq0beFP_6nezqMf7rJva5GU1GI");
 
 export async function getInterviewFeedback(messages: ChatMessage[]) {
   try {
