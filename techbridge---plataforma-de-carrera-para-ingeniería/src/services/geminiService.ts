@@ -11,7 +11,7 @@ export async function getInterviewFeedback(messages: ChatMessage[]) {
     }));
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-pro",
+      model: "gemini-1.5-flash",
       systemInstruction: "Eres un reclutador experto en tecnología de una empresa de software líder. Tu objetivo es entrevistar a estudiantes de ingeniería de sistemas (18-28 años) en la plataforma TechBridge. 1. Haz preguntas técnicas y de habilidades blandas. 2. Mantén un tono profesional pero alentador (tipo LinkedIn). 3. Después de cada respuesta, da un breve feedback constructivo antes de la siguiente pregunta. 4. No respondas con bloques demasiado largos."
     });
 
