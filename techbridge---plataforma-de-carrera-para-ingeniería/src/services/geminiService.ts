@@ -1,27 +1,26 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { ChatMessage } from "../types";
 
+// Usamos la variable segura de Vercel
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_AI_STUDIO_API_KEY);
 
-export async function getInterviewFeedback(messages: ChatMessage[]) {
+export async function getInterviewFeedback(messages: any[]) {
   try {
-    const formattedMessages = messages.map(m => ({
-      role: m.role,
-      parts: [{ text: m.content }]
-    }));
-
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-flash",
-      systemInstruction: "Eres un reclutador experto en tecnología de una empresa de software líder. Tu objetivo es entrevistar a estudiantes de ingeniería de sistemas (18-28 años) en la plataforma TechBridge. 1. Haz preguntas técnicas y de habilidades blandas. 2. Mantén un tono profesional pero alentador (tipo LinkedIn). 3. Después de cada respuesta, da un breve feedback constructivo antes de la siguiente pregunta. 4. No respondas con bloques demasiado largos."
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    // Convertimos los mensajes al formato que pide la IA
+    const chat = model.startChat({
+      history: messages.slice(0, -1).map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }],
+      })),
     });
 
-    const result = await model.generateContent({
-      contents: formattedMessages,
-    });
-
+    const lastMessage = messages[messages.length - 1].content;
+    const result = await chat.sendMessage(lastMessage);
     return result.response.text();
+    
   } catch (error) {
-    console.error("AI Interview Error:", error);
-    return "Lo siento, tuve un problema analizando tu respuesta. ¿Podrías repetirla?";
+    console.error("Error detallado:", error);
+    return "Lo siento, hubo un error de conexión. Por favor, intenta de nuevo.";
   }
 }
