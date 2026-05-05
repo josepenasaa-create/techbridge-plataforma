@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ChatMessage } from "../types";
 
-const genAI = new GoogleGenerativeAI("AIzaSyDk4cvF2Nq0beFP_6nezmMF7rjva5GU1GI");
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_AI_STUDIO_API_KEY);
 
 export async function getInterviewFeedback(messages: ChatMessage[]) {
   try {
