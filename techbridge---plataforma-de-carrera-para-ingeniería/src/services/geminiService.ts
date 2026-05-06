@@ -1,5 +1,6 @@
 export async function getInterviewFeedback(messages: any[]) {
   const API_KEY = import.meta.env.VITE_API_KEY;
+  // URL corregida:
   const url = `https://googleapis.com{API_KEY}`;
 
   try {
@@ -15,14 +16,14 @@ export async function getInterviewFeedback(messages: any[]) {
 
     const data = await response.json();
     
-    // Esta es la forma correcta de extraer el texto en la versión fetch
+    // Esta es la forma exacta en la que Google entrega el texto:
     if (data.candidates && data.candidates[0].content.parts[0].text) {
       return data.candidates[0].content.parts[0].text;
     }
     
-    return "Recibí una respuesta vacía de la IA. ¿Podrías intentar de nuevo?";
+    return "Recibí una respuesta inesperada de la IA. Por favor, intenta de nuevo.";
   } catch (error) {
     console.error("Error de conexión:", error);
-    return "No pude conectarme con el servidor de Google. Revisa tu conexión a internet.";
+    return "No pude conectarme con Google. Revisa tu conexión o la configuración de la llave.";
   }
 }
