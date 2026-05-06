@@ -4,26 +4,29 @@ const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_AI_STUDIO_API_K
 
 export async function getInterviewFeedback(messages: any[]) {
   try {
+    // Forzamos el modelo estable
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // La IA de Google exige que el historial SIEMPRE empiece con un mensaje del 'user'
-    // Como el primer mensaje es el saludo de la IA, lo filtramos para el historial
-    const history = messages
+    // Preparamos los mensajes: Google exige que el primero sea del 'user'
+    // Filtramos el saludo inicial del bot para que no cause error
+    const chatHistory = messages
       .slice(0, -1)
-      .filter((m, index) => !(index === 0 && m.role === 'model'))
+      .filter((m, i) => !(i === 0 && m.role === 'model'))
       .map(m => ({
         role: m.role === 'user' ? 'user' : 'model',
         parts: [{ text: m.content }],
       }));
 
-    const chat = model.startChat({ history });
     const lastMessage = messages[messages.length - 1].content;
-    const result = await chat.sendMessage(lastMessage);
+    
+    // Usamos la función más directa para evitar errores de historial
+    const result = await model.generateContent({
+      contents: [...chatHistory, { role: 'user', parts: [{ text: lastMessage }] }]
+    });
 
     return result.response.text();
-
   } catch (error) {
-    console.error("Error detallado:", error);
-    return "Tuve un pequeño problema técnico, pero ya estoy listo. ¿Podemos continuar?";
+    console.error("Error en la IA:", error);
+    return "Tuve un problema de conexión. ¿Podrías intentar enviarlo de nuevo?";
   }
 }
