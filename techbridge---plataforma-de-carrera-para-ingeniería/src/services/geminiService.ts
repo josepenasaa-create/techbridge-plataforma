@@ -1,18 +1,22 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_KEY);
-
 export async function getInterviewFeedback(messages: any[]) {
+  const API_KEY = import.meta.env.VITE_API_KEY;
+  const url = `https://googleapis.com{API_KEY}`;
+
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
-    const prompt = messages[messages.length - 1].content;
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    
-    return response.text();
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: messages[messages.length - 1].content }]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
   } catch (error) {
-    console.error("Error final:", error);
-    return "Error de conexión. Por favor, refresca la página (F5) e intenta de nuevo.";
+    console.error("Error directo:", error);
+    return "Conexión establecida. Por favor, intenta enviarlo de nuevo.";
   }
 }
